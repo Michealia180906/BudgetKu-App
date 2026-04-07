@@ -8,5 +8,6 @@
     <string name="transport">Transport</string>
     <string name="hitung">Hitung</string>
     <string name="lainnya">Lainnya</string>
-    <string name="Lainnya">Lainnya</string>
+    <string name="pengeluaran">pengeluaran</string>
+    <string name="uang_awal">Uang awal</string>
 </resources>

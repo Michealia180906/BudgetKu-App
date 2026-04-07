@@ -4,6 +4,8 @@ import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -13,6 +15,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.Alignment
 import com.michealia0091.budgetku.R
 import com.michealia0091.budgetku.ui.theme.BudgetKuTheme
 
@@ -46,11 +49,12 @@ fun MainScreen() {
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
+                .verticalScroll(rememberScrollState())
                 .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            //  Gambar koin
             Image(
                 painter = painterResource(id = R.drawable.koin),
                 contentDescription = null,
@@ -60,9 +64,11 @@ fun MainScreen() {
                 contentScale = ContentScale.Crop
             )
 
-            Text(stringResource(id = R.string.judul))
+            Text(
+                text = stringResource(id = R.string.judul),
+                style = MaterialTheme.typography.titleLarge
+            )
 
-            // Nama
             OutlinedTextField(
                 value = nama,
                 onValueChange = { nama = it },
@@ -70,52 +76,57 @@ fun MainScreen() {
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // Uang Awal
             OutlinedTextField(
                 value = uangAwal,
                 onValueChange = { uangAwal = it },
-                label = { Text("Uang Awal") },
+                label = { Text(stringResource(id = R.string.uang_awal)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // Pengeluaran
             OutlinedTextField(
                 value = pengeluaran,
                 onValueChange = { pengeluaran = it },
-                label = { Text("Pengeluaran") },
+                label = { Text(stringResource(id = R.string.pengeluaran)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Text(stringResource(id = R.string.kategori))
+            Text(
+                text = stringResource(id = R.string.kategori),
+                style = MaterialTheme.typography.titleMedium
+            )
 
-            //button
-            Row {
-                RadioButton(
-                    selected = kategori == "Makan",
-                    onClick = { kategori = "Makan" }
-                )
-                Text(stringResource(id = R.string.makan))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    RadioButton(
+                        selected = kategori == "Makan",
+                        onClick = { kategori = "Makan" }
+                    )
+                    Text(stringResource(id = R.string.makan))
+                }
 
-                Spacer(modifier = Modifier.width(16.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    RadioButton(
+                        selected = kategori == "Transport",
+                        onClick = { kategori = "Transport" }
+                    )
+                    Text(stringResource(id = R.string.transport))
+                }
 
-                RadioButton(
-                    selected = kategori == "Transport",
-                    onClick = { kategori = "Transport" }
-                )
-                Text(stringResource(id = R.string.transport))
-
-                Spacer(modifier = Modifier.width(16.dp))
-
-                RadioButton(
-                    selected = kategori == "Lainnya",
-                    onClick = { kategori = "Lainnya" }
-                )
-                Text(stringResource(id = R.string.lainnya))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    RadioButton(
+                        selected = kategori == "Lainnya",
+                        onClick = { kategori = "Lainnya" }
+                    )
+                    Text(stringResource(id = R.string.lainnya))
+                }
             }
 
-            // logicnnya dan bton
             Button(
                 onClick = {
                     if (nama.isEmpty() || uangAwal.isEmpty() || pengeluaran.isEmpty()) {
@@ -130,31 +141,35 @@ fun MainScreen() {
                             hasil = ""
                         } else {
                             val sisa = uang - keluar
-                            val persen = sisa.toFloat() / uang * 100
+
+
+                            val persen = if (uang == 0) 0f else sisa.toFloat() / uang * 100
 
                             val status = when {
-                                persen > 50 -> "Hemat "
-                                persen >= 20 -> "Cukup "
-                                else -> "Boros!"
+                                uang == 0 && keluar == 0 -> "Tidak ada"
+                                persen > 50 -> "Hemat"
+                                persen >= 20 -> "Cukup"
+                                else -> "Boros"
                             }
 
                             hasil = """
-                            Nama: $nama
-                            Sisa Uang: Rp$sisa
-                            Status: $status
-                            Kategori: $kategori
-                            """.trimIndent()
+Nama: $nama
+Sisa Uang: Rp$sisa
+Status: $status
+Kategori: $kategori
+""".trimIndent()
 
                             error = ""
                         }
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
             ) {
                 Text(stringResource(id = R.string.hitung))
             }
 
-            //  kalau gk di isi ERROR
             if (error.isNotEmpty()) {
                 Text(
                     text = error,
@@ -162,9 +177,18 @@ fun MainScreen() {
                 )
             }
 
-            // hasilnya
             if (hasil.isNotEmpty()) {
-                Text(text = hasil)
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer
+                    )
+                ) {
+                    Text(
+                        text = hasil,
+                        modifier = Modifier.padding(12.dp)
+                    )
+                }
             }
         }
     }
