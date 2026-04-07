@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">BudgetKu</string>
+    <string name="judul">Input Keuangan</string>
+    <string name="nama">Nama</string>
+    <string name="uang">Jumlah Uang</string>
+    <string name="kategori">Kategori</string>
+    <string name="makan">Makan</string>
+    <string name="transport">Transport</string>
+    <string name="hitung">Hitung</string>
+    <string name="lainnya">Lainnya</string>
+    <string name="Lainnya">Lainnya</string>
 </resources>

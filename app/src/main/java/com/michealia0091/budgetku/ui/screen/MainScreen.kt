@@ -1,0 +1,180 @@
+package com.michealia0091.budgetku.ui.screen
+
+import android.content.res.Configuration
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.layout.ContentScale
+import com.michealia0091.budgetku.R
+import com.michealia0091.budgetku.ui.theme.BudgetKuTheme
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MainScreen() {
+
+    var nama by remember { mutableStateOf("") }
+    var uangAwal by remember { mutableStateOf("") }
+    var pengeluaran by remember { mutableStateOf("") }
+    var kategori by remember { mutableStateOf("Makan") }
+
+    var hasil by remember { mutableStateOf("") }
+    var error by remember { mutableStateOf("") }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(stringResource(id = R.string.app_name))
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.primary
+                )
+            )
+        }
+    ) { innerPadding ->
+
+        Column(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+
+            //  Gambar koin
+            Image(
+                painter = painterResource(id = R.drawable.koin),
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(150.dp),
+                contentScale = ContentScale.Crop
+            )
+
+            Text(stringResource(id = R.string.judul))
+
+            // Nama
+            OutlinedTextField(
+                value = nama,
+                onValueChange = { nama = it },
+                label = { Text(stringResource(id = R.string.nama)) },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            // Uang Awal
+            OutlinedTextField(
+                value = uangAwal,
+                onValueChange = { uangAwal = it },
+                label = { Text("Uang Awal") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            // Pengeluaran
+            OutlinedTextField(
+                value = pengeluaran,
+                onValueChange = { pengeluaran = it },
+                label = { Text("Pengeluaran") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Text(stringResource(id = R.string.kategori))
+
+            //button
+            Row {
+                RadioButton(
+                    selected = kategori == "Makan",
+                    onClick = { kategori = "Makan" }
+                )
+                Text(stringResource(id = R.string.makan))
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                RadioButton(
+                    selected = kategori == "Transport",
+                    onClick = { kategori = "Transport" }
+                )
+                Text(stringResource(id = R.string.transport))
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                RadioButton(
+                    selected = kategori == "Lainnya",
+                    onClick = { kategori = "Lainnya" }
+                )
+                Text(stringResource(id = R.string.lainnya))
+            }
+
+            // logicnnya dan bton
+            Button(
+                onClick = {
+                    if (nama.isEmpty() || uangAwal.isEmpty() || pengeluaran.isEmpty()) {
+                        error = "Semua data harus diisi!"
+                        hasil = ""
+                    } else {
+                        val uang = uangAwal.toIntOrNull()
+                        val keluar = pengeluaran.toIntOrNull()
+
+                        if (uang == null || keluar == null) {
+                            error = "Masukkan angka yang valid!"
+                            hasil = ""
+                        } else {
+                            val sisa = uang - keluar
+                            val persen = sisa.toFloat() / uang * 100
+
+                            val status = when {
+                                persen > 50 -> "Hemat "
+                                persen >= 20 -> "Cukup "
+                                else -> "Boros!"
+                            }
+
+                            hasil = """
+                            Nama: $nama
+                            Sisa Uang: Rp$sisa
+                            Status: $status
+                            Kategori: $kategori
+                            """.trimIndent()
+
+                            error = ""
+                        }
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(stringResource(id = R.string.hitung))
+            }
+
+            //  kalau gk di isi ERROR
+            if (error.isNotEmpty()) {
+                Text(
+                    text = error,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+
+            // hasilnya
+            if (hasil.isNotEmpty()) {
+                Text(text = hasil)
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
+@Composable
+fun PreviewMainScreen() {
+    BudgetKuTheme {
+        MainScreen()
+    }
+}
