@@ -11,7 +11,11 @@
     <string name="pengeluaran">pengeluaran</string>
     <string name="uang_awal">Uang awal</string>
 
-
+    <string name="kembali">Kembali</string>
     <string name="tentang_aplikasi">Tentang Aplikasi</string>
     <string name="copyright">© 2026 BudgetKu App</string>
+
+    <string name="bagikan">Bagikan</string>
+
+    <string name="bagikan_template">Nama: %1$s\nSisa uang: Rp%2$s\nKategori: %3$s\nStatus: %4$s</string>
 </resources>

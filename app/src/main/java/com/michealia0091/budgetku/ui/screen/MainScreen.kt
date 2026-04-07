@@ -1,5 +1,7 @@
 package com.michealia0091.budgetku.ui.screen
 
+import android.content.Context
+import android.content.Intent
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -16,18 +18,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-
-
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import com.michealia0091.budgetku.R
 import com.michealia0091.budgetku.navigation.Screen
 import com.michealia0091.budgetku.ui.theme.BudgetKuTheme
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Info
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,6 +43,8 @@ fun MainScreen(navController: NavHostController) {
     var hasil by remember { mutableStateOf("") }
     var error by remember { mutableStateOf("") }
 
+    val context = LocalContext.current // ✅ sesuai modul
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -51,8 +55,6 @@ fun MainScreen(navController: NavHostController) {
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.primary
                 ),
-
-
                 actions = {
                     IconButton(onClick = {
                         navController.navigate(Screen.About.route)
@@ -175,11 +177,11 @@ fun MainScreen(navController: NavHostController) {
                             }
 
                             hasil = """
-Nama: $nama
-Sisa Uang: Rp$sisa
-Status: $status
-Kategori: $kategori
-""".trimIndent()
+                        Nama: $nama
+                        Sisa Uang: Rp$sisa
+                        Status: $status
+                        Kategori: $kategori
+                        """.trimIndent()
 
                             error = ""
                         }
@@ -211,6 +213,27 @@ Kategori: $kategori
                         modifier = Modifier.padding(12.dp)
                     )
                 }
+
+
+
+                Button(
+                    onClick = {
+                        val message = context.getString(
+                            R.string.bagikan_template,
+                            nama,
+                            (uangAwal.toIntOrNull() ?: 0) - (pengeluaran.toIntOrNull() ?: 0),
+                            kategori,
+                            hasil.substringAfter("Status: ")
+                        )
+
+
+                        shareData(context, message)
+                    },
+                    modifier = Modifier.padding(top = 8.dp),
+                    contentPadding = PaddingValues(horizontal = 32.dp, vertical = 16.dp)
+                ) {
+                    Text(text = stringResource(R.string.bagikan))
+                }
             }
         }
     }
@@ -222,5 +245,17 @@ Kategori: $kategori
 fun PreviewMainScreen() {
     BudgetKuTheme {
         MainScreen(rememberNavController())
+    }
+}
+
+
+private fun shareData(context: Context, message: String) {
+    val shareIntent = Intent(Intent.ACTION_SEND).apply {
+        type = "text/plain"
+        putExtra(Intent.EXTRA_TEXT, message)
+    }
+
+    if (shareIntent.resolveActivity(context.packageManager) != null) {
+        context.startActivity(shareIntent)
     }
 }
