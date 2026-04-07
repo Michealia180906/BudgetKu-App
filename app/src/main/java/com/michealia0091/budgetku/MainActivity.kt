@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import com.michealia0091.budgetku.navigation.SetupNavGraph
 import com.michealia0091.budgetku.ui.screen.MainScreen
 import com.michealia0091.budgetku.ui.theme.BudgetKuTheme
 
@@ -13,7 +14,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             BudgetKuTheme {
-                MainScreen() // 🔥 ini manggil dari file lain
+                SetupNavGraph()
             }
         }
     }
