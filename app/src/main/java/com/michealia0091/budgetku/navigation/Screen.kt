@@ -1,5 +1,6 @@
 package com.michealia0091.budgetku.navigation
 
-sealed class Screen(val route :String) {
+sealed class Screen(val route: String) {
     data object Home : Screen("mainScreen")
+    data object About : Screen("aboutScreen")
 }

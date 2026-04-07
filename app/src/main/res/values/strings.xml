@@ -10,4 +10,8 @@
     <string name="lainnya">Lainnya</string>
     <string name="pengeluaran">pengeluaran</string>
     <string name="uang_awal">Uang awal</string>
+
+
+    <string name="tentang_aplikasi">Tentang Aplikasi</string>
+    <string name="copyright">© 2026 BudgetKu App</string>
 </resources>
