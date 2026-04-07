@@ -60,4 +60,5 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     implementation("androidx.compose.material3:material3")
     implementation("androidx.navigation:navigation-compose")
+    implementation("androidx.compose.material:material-icons-extended")
 }

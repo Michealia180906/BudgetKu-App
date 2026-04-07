@@ -16,12 +16,22 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.Alignment
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+
+
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import com.michealia0091.budgetku.R
+import com.michealia0091.budgetku.navigation.Screen
 import com.michealia0091.budgetku.ui.theme.BudgetKuTheme
+
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Info
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen() {
+fun MainScreen(navController: NavHostController) {
 
     var nama by remember { mutableStateOf("") }
     var uangAwal by remember { mutableStateOf("") }
@@ -40,7 +50,20 @@ fun MainScreen() {
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.primary
-                )
+                ),
+
+
+                actions = {
+                    IconButton(onClick = {
+                        navController.navigate(Screen.About.route)
+                    }) {
+                        Icon(
+                            imageVector = Icons.Outlined.Info,
+                            contentDescription = stringResource(R.string.tentang_aplikasi),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
             )
         }
     ) { innerPadding ->
@@ -142,7 +165,6 @@ fun MainScreen() {
                         } else {
                             val sisa = uang - keluar
 
-
                             val persen = if (uang == 0) 0f else sisa.toFloat() / uang * 100
 
                             val status = when {
@@ -199,6 +221,6 @@ Kategori: $kategori
 @Composable
 fun PreviewMainScreen() {
     BudgetKuTheme {
-        MainScreen()
+        MainScreen(rememberNavController())
     }
 }
