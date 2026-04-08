@@ -25,6 +25,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.runtime.saveable.rememberSaveable
 import com.michealia0091.budgetku.R
 import com.michealia0091.budgetku.navigation.Screen
 import com.michealia0091.budgetku.ui.theme.BudgetKuTheme
@@ -36,13 +37,13 @@ import com.michealia0091.budgetku.ui.theme.BudgetKuTheme
 @Composable
 fun MainScreen(navController: NavHostController) {
 
-    var nama by remember { mutableStateOf("") }
-    var uangAwal by remember { mutableStateOf("") }
-    var pengeluaran by remember { mutableStateOf("") }
-    var kategori by remember { mutableStateOf("Makan") }
+    var nama by rememberSaveable { mutableStateOf("") }
+    var uangAwal by rememberSaveable { mutableStateOf("") }
+    var pengeluaran by rememberSaveable { mutableStateOf("") }
+    var kategori by rememberSaveable { mutableStateOf("Makan") }
 
-    var hasil by remember { mutableStateOf("") }
-    var error by remember { mutableStateOf("") }
+    var hasil by rememberSaveable { mutableStateOf("") }
+    var error by rememberSaveable { mutableStateOf("") }
 
     val context = LocalContext.current
 
