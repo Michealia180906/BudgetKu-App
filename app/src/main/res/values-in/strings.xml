@@ -1,6 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">BudgetKu</string>
-    <string name="judul">Input Keuangan</string>
+    <string name="judul">input Keuangan</string>
     <string name="nama">Nama</string>
     <string name="uang">Jumlah Uang</string>
     <string name="kategori">Kategori</string>
@@ -9,15 +10,10 @@
     <string name="hitung">Hitung</string>
     <string name="lainnya">Lainnya</string>
     <string name="pengeluaran">Pengeluaran</string>
-    <string name="uang_awal">Uang awal</string>
-
+    <string name="uang_awal">Uang Awal</string>
     <string name="kembali">Kembali</string>
-    <string name="tentang_aplikasi">Tentang Aplikasi</string>
+    <string name="tentang_aplikasi">Tentang Aplkasi</string>
     <string name="copyright">© 2026 BudgetKu App</string>
-
     <string name="bagikan">Bagikan</string>
-
-    <string name="bagikan_template">Nama: %1$s\nSisa uang: Rp%2$s\nKategori: %3$s\nStatus: %4$s</string>
-
-
+    <string name="bagikan_template">bagikan_template</string>
 </resources>

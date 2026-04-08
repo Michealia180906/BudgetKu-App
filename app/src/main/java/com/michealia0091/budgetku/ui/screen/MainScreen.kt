@@ -31,6 +31,7 @@ import com.michealia0091.budgetku.ui.theme.BudgetKuTheme
 
 
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(navController: NavHostController) {
@@ -43,7 +44,7 @@ fun MainScreen(navController: NavHostController) {
     var hasil by remember { mutableStateOf("") }
     var error by remember { mutableStateOf("") }
 
-    val context = LocalContext.current // ✅ sesuai modul
+    val context = LocalContext.current
 
     Scaffold(
         topBar = {
@@ -215,7 +216,6 @@ fun MainScreen(navController: NavHostController) {
                 }
 
 
-
                 Button(
                     onClick = {
                         val message = context.getString(
@@ -257,5 +257,13 @@ private fun shareData(context: Context, message: String) {
 
     if (shareIntent.resolveActivity(context.packageManager) != null) {
         context.startActivity(shareIntent)
+    }
+}
+@Preview(showBackground = true)
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
+@Composable
+fun MainScreenPreview() {
+    BudgetKuTheme {
+        MainScreen(rememberNavController())
     }
 }
