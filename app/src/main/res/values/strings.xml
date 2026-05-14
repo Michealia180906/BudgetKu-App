@@ -18,6 +18,7 @@
     <string name="bagikan">Bagikan</string>
 
     <string name="bagikan_template">Nama: %1$s\nSisa uang: Rp%2$s\nKategori: %3$s\nStatus: %4$s</string>
+    <string name="deskripsi_aplikasi">Deskripsi Aplikasi</string>
 
 
 </resources>

@@ -16,4 +16,5 @@
     <string name="copyright">© 2026 BudgetKu App</string>
     <string name="bagikan">Bagikan</string>
     <string name="bagikan_template">bagikan_template</string>
+    <string name="deskripsi_aplikasi">Aplikasi sederhana untuk mencatat pemasukan, pengeluaran, dan menghitung saldo.</string>
 </resources>

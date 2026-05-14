@@ -1,69 +1,71 @@
 package com.michealia0091.budgetku.ui.screen
 
-import android.content.Context
-import android.content.Intent
 import android.content.res.Configuration
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.runtime.saveable.rememberSaveable
-import com.michealia0091.budgetku.R
 import com.michealia0091.budgetku.navigation.Screen
 import com.michealia0091.budgetku.ui.theme.BudgetKuTheme
 
-
-
+data class CatatanUang(
+    val keterangan: String,
+    val nominal: Int,
+    val jenis: String
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(navController: NavHostController) {
 
-    var nama by rememberSaveable { mutableStateOf("") }
-    var uangAwal by rememberSaveable { mutableStateOf("") }
-    var pengeluaran by rememberSaveable { mutableStateOf("") }
-    var kategori by rememberSaveable { mutableStateOf("Makan") }
-
-    var hasil by rememberSaveable { mutableStateOf("") }
+    var keterangan by rememberSaveable { mutableStateOf("") }
+    var nominal by rememberSaveable { mutableStateOf("") }
+    var saldoManual by rememberSaveable { mutableStateOf("") }
+    var jenis by rememberSaveable { mutableStateOf("Masuk") }
     var error by rememberSaveable { mutableStateOf("") }
 
-    val context = LocalContext.current
+    val daftarCatatan = remember { mutableStateListOf<CatatanUang>() }
+
+    val totalMasuk = daftarCatatan
+        .filter { it.jenis == "Masuk" }
+        .sumOf { it.nominal }
+
+    val totalKeluar = daftarCatatan
+        .filter { it.jenis == "Keluar" }
+        .sumOf { it.nominal }
+
+    val saldoAwal = saldoManual.toIntOrNull() ?: 0
+    val saldo = saldoAwal + totalMasuk - totalKeluar
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = {
-                    Text(stringResource(id = R.string.app_name))
-                },
+                title = { Text("BudgetKu") },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.primary
                 ),
                 actions = {
-                    IconButton(onClick = {
-                        navController.navigate(Screen.About.route)
-                    }) {
+                    IconButton(
+                        onClick = {
+                            navController.navigate(Screen.About.route)
+                        }
+                    ) {
                         Icon(
                             imageVector = Icons.Outlined.Info,
-                            contentDescription = stringResource(R.string.tentang_aplikasi),
+                            contentDescription = "Tentang Aplikasi",
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }
@@ -82,45 +84,39 @@ fun MainScreen(navController: NavHostController) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            Image(
-                painter = painterResource(id = R.drawable.koin),
-                contentDescription = null,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(150.dp),
-                contentScale = ContentScale.Crop
-            )
-
             Text(
-                text = stringResource(id = R.string.judul),
+                text = "Input Catatan Uang",
                 style = MaterialTheme.typography.titleLarge
             )
 
             OutlinedTextField(
-                value = nama,
-                onValueChange = { nama = it },
-                label = { Text(stringResource(id = R.string.nama)) },
-                modifier = Modifier.fillMaxWidth()
+                value = keterangan,
+                onValueChange = { keterangan = it },
+                label = { Text("Keterangan") },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true
             )
 
             OutlinedTextField(
-                value = uangAwal,
-                onValueChange = { uangAwal = it },
-                label = { Text(stringResource(id = R.string.uang_awal)) },
+                value = nominal,
+                onValueChange = { nominal = it },
+                label = { Text("Nominal") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true
             )
 
             OutlinedTextField(
-                value = pengeluaran,
-                onValueChange = { pengeluaran = it },
-                label = { Text(stringResource(id = R.string.pengeluaran)) },
+                value = saldoManual,
+                onValueChange = { saldoManual = it },
+                label = { Text("Saldo Manual") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true
             )
 
             Text(
-                text = stringResource(id = R.string.kategori),
+                text = "Jenis Catatan",
                 style = MaterialTheme.typography.titleMedium
             )
 
@@ -131,69 +127,49 @@ fun MainScreen(navController: NavHostController) {
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     RadioButton(
-                        selected = kategori == "Makan",
-                        onClick = { kategori = "Makan" }
+                        selected = jenis == "Masuk",
+                        onClick = { jenis = "Masuk" }
                     )
-                    Text(stringResource(id = R.string.makan))
+                    Text("Masuk")
                 }
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     RadioButton(
-                        selected = kategori == "Transport",
-                        onClick = { kategori = "Transport" }
+                        selected = jenis == "Keluar",
+                        onClick = { jenis = "Keluar" }
                     )
-                    Text(stringResource(id = R.string.transport))
-                }
-
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    RadioButton(
-                        selected = kategori == "Lainnya",
-                        onClick = { kategori = "Lainnya" }
-                    )
-                    Text(stringResource(id = R.string.lainnya))
+                    Text("Keluar")
                 }
             }
 
             Button(
                 onClick = {
-                    if (nama.isEmpty() || uangAwal.isEmpty() || pengeluaran.isEmpty()) {
-                        error = "Semua data harus diisi!"
-                        hasil = ""
+                    val jumlah = nominal.toIntOrNull()
+
+                    if (keterangan.isBlank() || nominal.isBlank()) {
+                        error = "Keterangan dan nominal harus diisi!"
+                    } else if (jumlah == null || jumlah <= 0) {
+                        error = "Nominal harus berupa angka lebih dari 0!"
                     } else {
-                        val uang = uangAwal.toIntOrNull()
-                        val keluar = pengeluaran.toIntOrNull()
+                        daftarCatatan.add(
+                            CatatanUang(
+                                keterangan = keterangan,
+                                nominal = jumlah,
+                                jenis = jenis
+                            )
+                        )
 
-                        if (uang == null || keluar == null) {
-                            error = "Masukkan angka yang valid!"
-                            hasil = ""
-                        } else {
-                            val sisa = uang - keluar
-
-                            val persen = if (uang == 0) 0f else sisa.toFloat() / uang * 100
-
-                            val status = when {
-                                uang == 0 && keluar == 0 -> "Tidak ada"
-                                persen > 50 -> "Hemat"
-                                persen >= 20 -> "Cukup"
-                                else -> "Boros"
-                            }
-
-                            hasil = """
-                        Nama: $nama
-                        Sisa Uang: Rp$sisa
-                        Status: $status
-                        Kategori: $kategori
-                        """.trimIndent()
-
-                            error = ""
-                        }
+                        keterangan = ""
+                        nominal = ""
+                        jenis = "Masuk"
+                        error = ""
                     }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp)
             ) {
-                Text(stringResource(id = R.string.hitung))
+                Text("Simpan Catatan")
             }
 
             if (error.isNotEmpty()) {
@@ -203,63 +179,57 @@ fun MainScreen(navController: NavHostController) {
                 )
             }
 
-            if (hasil.isNotEmpty()) {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer
-                    )
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer
+                )
+            ) {
+                Column(
+                    modifier = Modifier.padding(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    Text(
-                        text = hasil,
-                        modifier = Modifier.padding(12.dp)
-                    )
+                    Text("Total Masuk: Rp$totalMasuk")
+                    Text("Total Keluar: Rp$totalKeluar")
+                    Text("Saldo: Rp$saldo")
                 }
+            }
 
+            Text(
+                text = "Daftar Catatan",
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.fillMaxWidth()
+            )
 
-                Button(
-                    onClick = {
-                        val message = context.getString(
-                            R.string.bagikan_template,
-                            nama,
-                            (uangAwal.toIntOrNull() ?: 0) - (pengeluaran.toIntOrNull() ?: 0),
-                            kategori,
-                            hasil.substringAfter("Status: ")
-                        )
-
-
-                        shareData(context, message)
-                    },
-                    modifier = Modifier.padding(top = 8.dp),
-                    contentPadding = PaddingValues(horizontal = 32.dp, vertical = 16.dp)
-                ) {
-                    Text(text = stringResource(R.string.bagikan))
+            if (daftarCatatan.isEmpty()) {
+                Text("Belum ada catatan uang.")
+            } else {
+                daftarCatatan.forEach { catatan ->
+                    Card(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(12.dp),
+                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Text(
+                                text = if (catatan.jenis == "Masuk") {
+                                    "+ Rp${catatan.nominal}"
+                                } else {
+                                    "- Rp${catatan.nominal}"
+                                },
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                            Text(catatan.keterangan)
+                            Text(catatan.jenis)
+                        }
+                    }
                 }
             }
         }
     }
 }
 
-@Preview(showBackground = true)
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
-@Composable
-fun PreviewMainScreen() {
-    BudgetKuTheme {
-        MainScreen(rememberNavController())
-    }
-}
-
-
-private fun shareData(context: Context, message: String) {
-    val shareIntent = Intent(Intent.ACTION_SEND).apply {
-        type = "text/plain"
-        putExtra(Intent.EXTRA_TEXT, message)
-    }
-
-    if (shareIntent.resolveActivity(context.packageManager) != null) {
-        context.startActivity(shareIntent)
-    }
-}
 @Preview(showBackground = true)
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
 @Composable
