@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.navigation.compose.rememberNavController
 import com.michealia0091.budgetku.navigation.SetupNavGraph
 import com.michealia0091.budgetku.ui.theme.BudgetKuTheme
 
@@ -15,8 +14,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             BudgetKuTheme {
-                val navController = rememberNavController()
-                SetupNavGraph(navController)
+                SetupNavGraph()
             }
         }
     }
