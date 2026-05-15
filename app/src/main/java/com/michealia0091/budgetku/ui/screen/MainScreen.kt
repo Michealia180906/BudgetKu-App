@@ -31,6 +31,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -40,6 +41,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -50,17 +52,24 @@ import com.michealia0091.budgetku.database.KeuanganDb
 import com.michealia0091.budgetku.model.Keuangan
 import com.michealia0091.budgetku.navigation.Screen
 import com.michealia0091.budgetku.ui.theme.BudgetKuTheme
+import com.michealia0091.budgetku.util.SettingsDataStore
 import com.michealia0091.budgetku.util.ViewModelFactory
 import com.michealia0091.budgetku.viewmodel.MainViewModel
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(navController: NavHostController) {
 
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
     val db = KeuanganDb.getInstance(context)
     val factory = ViewModelFactory(db.dao)
     val viewModel: MainViewModel = viewModel(factory = factory)
+
+    val settingsDataStore = SettingsDataStore(context)
+    val showList by settingsDataStore.layoutFlow.collectAsState(initial = true)
 
     val daftarKeuangan by viewModel.dataKeuangan.collectAsState()
 
@@ -68,7 +77,6 @@ fun MainScreen(navController: NavHostController) {
     var nominal by rememberSaveable { mutableStateOf("") }
     var saldoManual by rememberSaveable { mutableStateOf("") }
     var jenis by rememberSaveable { mutableStateOf("Masuk") }
-    var showList by rememberSaveable { mutableStateOf(true) }
 
     val totalMasuk = daftarKeuangan
         .filter { it.jenis == "Masuk" }
@@ -84,7 +92,9 @@ fun MainScreen(navController: NavHostController) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("BudgetKu") },
+                title = {
+                    Text("BudgetKu")
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.primary
@@ -92,7 +102,9 @@ fun MainScreen(navController: NavHostController) {
                 actions = {
                     IconButton(
                         onClick = {
-                            showList = !showList
+                            scope.launch {
+                                settingsDataStore.saveLayout(!showList)
+                            }
                         }
                     ) {
                         Icon(
@@ -121,7 +133,7 @@ fun MainScreen(navController: NavHostController) {
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.Info,
-                            contentDescription = "Tentang Aplikasi",
+                            contentDescription = stringResource(R.string.tentang_aplikasi),
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }
@@ -150,7 +162,9 @@ fun MainScreen(navController: NavHostController) {
                 OutlinedTextField(
                     value = keterangan,
                     onValueChange = { keterangan = it },
-                    label = { Text("Keterangan") },
+                    label = {
+                        Text("Keterangan")
+                    },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true
                 )
@@ -160,7 +174,9 @@ fun MainScreen(navController: NavHostController) {
                 OutlinedTextField(
                     value = nominal,
                     onValueChange = { nominal = it },
-                    label = { Text("Nominal") },
+                    label = {
+                        Text("Nominal")
+                    },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Number
                     ),
@@ -173,7 +189,9 @@ fun MainScreen(navController: NavHostController) {
                 OutlinedTextField(
                     value = saldoManual,
                     onValueChange = { saldoManual = it },
-                    label = { Text("Saldo Manual") },
+                    label = {
+                        Text("Saldo Manual")
+                    },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Number
                     ),
@@ -195,18 +213,26 @@ fun MainScreen(navController: NavHostController) {
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         RadioButton(
                             selected = jenis == "Masuk",
-                            onClick = { jenis = "Masuk" }
+                            onClick = {
+                                jenis = "Masuk"
+                            }
                         )
                         Text("Masuk")
                     }
 
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         RadioButton(
                             selected = jenis == "Keluar",
-                            onClick = { jenis = "Keluar" }
+                            onClick = {
+                                jenis = "Keluar"
+                            }
                         )
                         Text("Keluar")
                     }
@@ -342,7 +368,9 @@ fun KeuanganListItem(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClick() }
+            .clickable {
+                onClick()
+            }
     ) {
         Column(
             modifier = Modifier.padding(12.dp),
@@ -354,10 +382,17 @@ fun KeuanganListItem(
                 } else {
                     "- Rp${keuangan.nominal}"
                 },
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleMedium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
 
-            Text(text = keuangan.keterangan)
+            Text(
+                text = keuangan.keterangan,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+
             Text(text = keuangan.jenis)
         }
     }
@@ -371,7 +406,9 @@ fun KeuanganGridItem(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClick() }
+            .clickable {
+                onClick()
+            }
     ) {
         Column(
             modifier = Modifier.padding(8.dp),
@@ -386,14 +423,22 @@ fun KeuanganGridItem(
                 style = MaterialTheme.typography.titleMedium
             )
 
-            Text(text = keuangan.keterangan)
+            Text(
+                text = keuangan.keterangan,
+                maxLines = 4,
+                overflow = TextOverflow.Ellipsis
+            )
+
             Text(text = keuangan.jenis)
         }
     }
 }
 
 @Preview(showBackground = true)
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    showBackground = true
+)
 @Composable
 fun MainScreenPreview() {
     BudgetKuTheme {
